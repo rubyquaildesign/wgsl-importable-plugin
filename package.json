@@ -3,21 +3,22 @@
   "version": "1.0.0",
   "type": "module",
   "description": "",
+  "main": "./output/index.cjs",
   "exports": {
-    ".":{
-      "import":"./dist/index.js",
-      "require":"./dist/index.cjs",
-      "types":"./dist/index.d.ts"
+    ".": {
+      "import": "./output/index.mjs",
+      "require": "./output/index.cjs",
+      "types": "./dist/index.d.mts"
     },
-    "./tsconfig":{
-      "import":"./dist/index.js",
-      "require":"./dist/index.cjs",
-      "types":"./dist/index.d.ts"
+    "./tsconfig": {
+      "import": "./output/index.mjs",
+      "require": "./output/index.cjs",
+      "types": "./dist/index.d.mts"
     },
-    "./vite":{
-      "import":"./dist/vite.js",
-      "require":"./dist/vite.cjs",
-      "types":"./dist/vite.d.ts"
+    "./vite": {
+      "import": "./output/vite.mjs",
+      "require": "./output/vite.cjs",
+      "types": "./dist/vite.d.mts"
     }
   },
   "scripts": {
@@ -30,11 +31,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@rupertofly/vite-plugin-glsl": "github:rubyquaildesign/vite-plugin-glsl"
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@rupertofly/vite-plugin-glsl": "github:rubyquaildesign/vite-plugin-glsl",
+    "rollup-plugin-ts": "^3.4.5"
   },
   "devDependencies": {
     "eslint-config-standard-typescript-prettier": "^6.0.0",
     "importable": "^0.1.0",
+    "rollup": "^4.9.6",
     "tsup": "^8.0.1"
   }
 }

@@ -9,21 +9,30 @@ if (vPlugin.configResolved) {
 	});
 }
 
-export const testImportModuleSpecifier: ImportablePlugin['testImportModuleSpecifier'] =
+const testImportModuleSpecifier: ImportablePlugin['testImportModuleSpecifier'] =
 	(moduleName) => {
 		return moduleName.endsWith('.wgsl');
 	};
-export const testImportAttributes: ImportablePlugin['testImportAttributes'] = (
+const testImportAttributes: ImportablePlugin['testImportModuleSpecifier'] = (
 	importAttributes,
-) => importAttributes.type === 'wgsl';
+) => (importAttributes as any).type === 'wgsl';
 
-export const generateTypescriptDefinition: ImportablePlugin['generateTypeScriptDefinition'] =
+const generateTypeScriptDefinition: ImportablePlugin['generateTypeScriptDefinition'] =
 	(_fileName, _importAttributes, code) => {
+		console.error('is this where it fails');
+		console.error(JSON.stringify({ code, _fileName }));
+		console.error(JSON.stringify(vPlugin));
 		const result = (vPlugin as any).transform(code, _fileName);
+		console.error(JSON.stringify(result));
 		return `
-    export code: string;
-    export definitions: Object as ${JSON.stringify(result.data.definitions)};
+    export const code: string;
+    export const definitions: ${JSON.stringify(result.data.definitions)};
     
     export default code;
     `;
 	};
+export {
+	generateTypeScriptDefinition,
+	testImportAttributes,
+	testImportModuleSpecifier,
+};

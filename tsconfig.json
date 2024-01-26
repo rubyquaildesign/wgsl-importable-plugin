@@ -4,16 +4,16 @@
     "module": "ESNext",
     "moduleDetection": "force",
     "moduleResolution": "Bundler",
-    "noEmit": true,
     "sourceMap": true,
     "esModuleInterop": false,
     "forceConsistentCasingInFileNames": true,
     "verbatimModuleSyntax": true,
     "strict": true,
+    "declaration": true,
     "skipLibCheck": true
   },
   "include": [
     "src/**.ts",
     "./tsup.config.ts"
-  ]
+, "src/index.ts"  ]
 }
