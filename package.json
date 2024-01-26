@@ -1,0 +1,40 @@
+{
+  "name": "@rupertofly/wgsl-importable-plugin",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "exports": {
+    ".":{
+      "import":"./dist/index.js",
+      "require":"./dist/index.cjs",
+      "types":"./dist/index.d.ts"
+    },
+    "./tsconfig":{
+      "import":"./dist/index.js",
+      "require":"./dist/index.cjs",
+      "types":"./dist/index.d.ts"
+    },
+    "./vite":{
+      "import":"./dist/vite.js",
+      "require":"./dist/vite.cjs",
+      "types":"./dist/vite.d.ts"
+    }
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@rupertofly/vite-plugin-glsl": "github:rubyquaildesign/vite-plugin-glsl"
+  },
+  "devDependencies": {
+    "eslint-config-standard-typescript-prettier": "^6.0.0",
+    "importable": "^0.1.0",
+    "tsup": "^8.0.1"
+  }
+}
