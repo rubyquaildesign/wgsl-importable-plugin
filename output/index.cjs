@@ -3,7 +3,6 @@
 var path = require('path');
 var process$1 = require('process');
 var fs = require('fs');
-var pm = require('picomatch');
 
 /**
  * @name recursiveChunk
@@ -4360,76 +4359,6 @@ const kTypedArrayToAttribFormat = new Map([
 ]);
 new Map([...kTypedArrayToAttribFormat.entries()].map(([Type, { formats: [s1, s2] }]) => [[s1, Type], [s2, Type]]).flat());
 
-// Helper since Typescript can't detect readonly arrays with Array.isArray
-function isArray(arg) {
-    return Array.isArray(arg);
-}
-function ensureArray(thing) {
-    if (isArray(thing))
-        return thing;
-    if (thing == null)
-        return [];
-    return [thing];
-}
-
-const normalizePath = function normalizePath(filename) {
-    return filename.split(path.win32.sep).join(path.posix.sep);
-};
-
-function getMatcherString(id, resolutionBase) {
-    if (resolutionBase === false || path.isAbsolute(id) || id.startsWith('**')) {
-        return normalizePath(id);
-    }
-    // resolve('') is valid and will default to process.cwd()
-    const basePath = normalizePath(path.resolve(resolutionBase || ''))
-        // escape all possible (posix + win) path characters that might interfere with regex
-        .replace(/[-^$*+?.()|[\]{}]/g, '\\$&');
-    // Note that we use posix.join because:
-    // 1. the basePath has been normalized to use /
-    // 2. the incoming glob (id) matcher, also uses /
-    // otherwise Node will force backslash (\) on windows
-    return path.posix.join(basePath, normalizePath(id));
-}
-const createFilter = function createFilter(include, exclude, options) {
-    const resolutionBase = options && options.resolve;
-    const getMatcher = (id) => id instanceof RegExp
-        ? id
-        : {
-            test: (what) => {
-                // this refactor is a tad overly verbose but makes for easy debugging
-                const pattern = getMatcherString(id, resolutionBase);
-                const fn = pm(pattern, { dot: true });
-                const result = fn(what);
-                return result;
-            }
-        };
-    const includeMatchers = ensureArray(include).map(getMatcher);
-    const excludeMatchers = ensureArray(exclude).map(getMatcher);
-    return function result(id) {
-        if (typeof id !== 'string')
-            return false;
-        if (/\0/.test(id))
-            return false;
-        const pathId = normalizePath(id);
-        for (let i = 0; i < excludeMatchers.length; ++i) {
-            const matcher = excludeMatchers[i];
-            if (matcher.test(pathId))
-                return false;
-        }
-        for (let i = 0; i < includeMatchers.length; ++i) {
-            const matcher = includeMatchers[i];
-            if (matcher.test(pathId))
-                return true;
-        }
-        return !includeMatchers.length;
-    };
-};
-
-const reservedWords = 'break case class catch const continue debugger default delete do else export extends finally for function if import in instanceof let new return super switch this throw try typeof var void while with yield enum await implements package protected static interface private public';
-const builtins = 'arguments Infinity NaN undefined null true false eval uneval isFinite isNaN parseFloat parseInt decodeURI decodeURIComponent encodeURI encodeURIComponent escape unescape Object Function Boolean Symbol Error EvalError InternalError RangeError ReferenceError SyntaxError TypeError URIError Number Math Date String RegExp Array Int8Array Uint8Array Uint8ClampedArray Int16Array Uint16Array Int32Array Uint32Array Float32Array Float64Array Map Set WeakMap WeakSet SIMD ArrayBuffer DataView JSON Promise Generator GeneratorFunction Reflect Proxy Intl';
-const forbiddenIdentifiers = new Set(`${reservedWords} ${builtins}`.split(' '));
-forbiddenIdentifiers.add('');
-
 /**
  * @const
  * @default
@@ -4462,7 +4391,7 @@ const DEFAULT_SHADERS = Object.freeze([
 function index ({ include = DEFAULT_SHADERS, exclude = undefined, warnDuplicatedImports = true, defaultExtension = DEFAULT_EXTENSION, compress = false, watch = true, root = '/' } = {}) {
     let server = undefined;
     const prod = process.env.NODE_ENV === 'production';
-    const filter = createFilter(include, exclude);
+    const filter = /.+\.wgsl/;
     return ({
         enforce: 'pre',
         name: 'vite-plugin-glsl',
@@ -4472,7 +4401,7 @@ function index ({ include = DEFAULT_SHADERS, exclude = undefined, warnDuplicated
         configResolved(resolvedConfig) {
         },
         transform(source, shader) {
-            if (!filter(shader))
+            if (!(filter.test(shader)))
                 return;
             globalThis.GPUShaderStage = {
                 VERTEX: 1,
@@ -4500,7 +4429,7 @@ function index ({ include = DEFAULT_SHADERS, exclude = undefined, warnDuplicated
             const makeShaderDataDefinitions$1 = makeShaderDataDefinitions;
             const definitions = makeShaderDataDefinitions$1(outputShader.replace(/(^|\s)override/g, 'const'));
             return {
-                code: `export const code = \`${outputShader}\`;\n\nexport const definitions = \`${JSON.stringify(definitions)}\`;\n\nexport default code`, map: null, data: {
+                code: `export const code = \`${outputShader}\`;\n\nexport const definitions = ${JSON.stringify(definitions)};\n\nexport default code`, map: null, data: {
                     code: outputShader, definitions
                 }
             };

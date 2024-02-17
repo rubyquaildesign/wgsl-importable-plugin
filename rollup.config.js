@@ -9,6 +9,10 @@ export default defineConfig({
 			file: 'output/vite.cjs',
 			format: 'cjs',
 		},
+		{
+			file: 'output/vite.mjs',
+			format: 'esm',
+		},
 	],
 	plugins: [nodeResolve(), typescriptPlugin()],
 
