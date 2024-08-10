@@ -1,4 +1,4 @@
-import plugin from '@rupertofly/vite-plugin-glsl';
+import plugin from './vite';
 import type { ImportablePlugin } from 'importable';
 const vPlugin = plugin();
 if (vPlugin.configResolved) {

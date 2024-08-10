@@ -1,3 +1,13 @@
+import { Plugin } from 'vite';
+
+/**
+ * @module vite-plugin-glsl
+ * @author Ustym Ukhman <ustym.ukhman@gmail.com>
+ * @description Import, inline (and compress) GLSL shader files
+ * @version 1.2.1
+ * @license MIT
+ */
+
 /**
  * @function
  * @name wgsl
@@ -20,4 +30,5 @@ declare function wgsl({ include, exclude, warnDuplicatedImports, defaultExtensio
     watch?: boolean | undefined;
     root?: string | undefined;
 }): Plugin;
+
 export { wgsl as default, wgsl };

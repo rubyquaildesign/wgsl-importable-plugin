@@ -8,17 +8,17 @@
     ".": {
       "import": "./output/index.mjs",
       "require": "./output/index.cjs",
-      "types": "./dist/index.d.mts"
+      "types": "./output/index.d.mts"
     },
     "./tsconfig": {
       "import": "./output/index.mjs",
       "require": "./output/index.cjs",
-      "types": "./dist/index.d.mts"
+      "types": "./output/index.d.mts"
     },
     "./vite": {
       "import": "./output/vite.mjs",
       "require": "./output/vite.cjs",
-      "types": "./dist/vite.d.mts"
+      "types": "./output/vite.d.mts"
     }
   },
   "scripts": {
@@ -31,15 +31,19 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@rollup/plugin-node-resolve": "^15.2.3",
-    "@rollup/plugin-typescript": "^11.1.6",
-    "@rupertofly/vite-plugin-glsl": "github:rubyquaildesign/vite-plugin-glsl",
-    "rollup-plugin-ts": "^3.4.5"
+    "glob": "^11.0.0",
+    "rollup-plugin-ts": "^3.4.5",
+    "vite": "^5.4.0",
+    "webgpu-utils": "^1.9.2",
+    "wgsl-linker": "^0.4.6"
   },
   "devDependencies": {
+    "@rollup/plugin-commonjs": "^26.0.1",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-typescript": "^11.1.6",
     "eslint-config-standard-typescript-prettier": "^6.0.0",
     "importable": "^0.1.0",
-    "rollup": "^4.9.6",
-    "tsup": "^8.0.1"
+    "rollup": "^4.20.0",
+    "tsup": "^8.2.4"
   }
 }

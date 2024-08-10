@@ -5,7 +5,7 @@
     "moduleDetection": "force",
     "moduleResolution": "Bundler",
     "sourceMap": true,
-    "esModuleInterop": false,
+    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "verbatimModuleSyntax": true,
     "strict": true,
