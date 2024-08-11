@@ -1,5 +1,5 @@
 /**
- * @module vite-plugin-glsl
+ * @module vite-plugin-wgsl
  * @author Ustym Ukhman <ustym.ukhman@gmail.com>
  * @description Import, inline (and compress) GLSL shader files
  * @version 1.2.1
@@ -16,7 +16,7 @@ import { readFileSync } from 'node:fs';
  * @readonly
  * @type {string}
  */
-const DEFAULT_EXTENSION = 'glsl';
+const DEFAULT_EXTENSION = 'wgsl';
 
 /**
  * @const
@@ -24,7 +24,7 @@ const DEFAULT_EXTENSION = 'glsl';
  * @readonly
  * @type {readonly RegExp[]}
  */
-const DEFAULT_SHADERS = Object.freeze(['**/*.wgsl']) as string[];
+const DEFAULT_SHADERS = Object.freeze(['./**/*.wgsl']) as string[];
 
 /**
  * @function
@@ -54,7 +54,7 @@ export function wgsl({
 
 	return {
 		enforce: 'pre',
-		name: 'vite-plugin-glsl',
+		name: 'vite-plugin-wgsl',
 
 		configureServer(devServer) {
 			server = devServer;
@@ -64,22 +64,23 @@ export function wgsl({
 			config = resolvedConfig;
 		},
 
-		transform(source, shader, ...other) {
+		transform(source, shader, options?: Record<string, any>) {
 			if (!filter.test(shader)) return;
 			(globalThis as any).GPUShaderStage = {
 				VERTEX: 1,
 				FRAGMENT: 2,
 				COMPUTE: 4,
 			};
-
-			const files = globSync([...include, '!node_modules'].filter(Boolean), {
+			const files = globSync([...include].filter(Boolean), {
 				ignore: exclude,
 				absolute: true,
+				cwd: options && 'cwd' in options ? options.cwd : undefined,
 			});
 			const fileMap: any = {};
 			for (const file of files) {
 				fileMap[file] = readFileSync(file, 'utf8');
 			}
+			console.log(JSON.stringify(fileMap, null, 2));
 			const registary = new ModuleRegistry({
 				wgsl: fileMap,
 			});

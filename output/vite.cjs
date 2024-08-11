@@ -14584,14 +14584,14 @@ glob.glob = glob;
  * @readonly
  * @type {string}
  */
-const DEFAULT_EXTENSION = 'glsl';
+const DEFAULT_EXTENSION = 'wgsl';
 /**
  * @const
  * @default
  * @readonly
  * @type {readonly RegExp[]}
  */
-const DEFAULT_SHADERS = Object.freeze(['**/*.wgsl']);
+const DEFAULT_SHADERS = Object.freeze(['./**/*.wgsl']);
 /**
  * @function
  * @name wgsl
@@ -14610,12 +14610,12 @@ function wgsl({ include = DEFAULT_SHADERS, exclude = undefined, warnDuplicatedIm
     const filter = /.+\.wgsl/;
     return {
         enforce: 'pre',
-        name: 'vite-plugin-glsl',
+        name: 'vite-plugin-wgsl',
         configureServer(devServer) {
         },
         configResolved(resolvedConfig) {
         },
-        transform(source, shader, ...other) {
+        transform(source, shader, options) {
             if (!filter.test(shader))
                 return;
             globalThis.GPUShaderStage = {
@@ -14623,14 +14623,19 @@ function wgsl({ include = DEFAULT_SHADERS, exclude = undefined, warnDuplicatedIm
                 FRAGMENT: 2,
                 COMPUTE: 4,
             };
-            const files = globSync([...include, '!node_modules'].filter(Boolean), {
+            if (options && 'cwd' in options) {
+                console.error(options.cwd);
+            }
+            const files = globSync([...include].filter(Boolean), {
                 ignore: exclude,
                 absolute: true,
+                cwd: options && 'cwd' in options ? options.cwd : undefined,
             });
             const fileMap = {};
             for (const file of files) {
                 fileMap[file] = actualFS.readFileSync(file, 'utf8');
             }
+            console.log(JSON.stringify(fileMap, null, 2));
             const registary = new ModuleRegistry({
                 wgsl: fileMap,
             });

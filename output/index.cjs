@@ -8,6 +8,8 @@ var promises = require('node:fs/promises');
 var node_events = require('node:events');
 var Stream = require('node:stream');
 var node_string_decoder = require('node:string_decoder');
+var path$1 = require('path');
+var process$1 = require('node:process');
 
 function _interopNamespaceDefault(e) {
   var n = Object.create(null);
@@ -14582,14 +14584,14 @@ glob.glob = glob;
  * @readonly
  * @type {string}
  */
-const DEFAULT_EXTENSION = 'glsl';
+const DEFAULT_EXTENSION = 'wgsl';
 /**
  * @const
  * @default
  * @readonly
  * @type {readonly RegExp[]}
  */
-const DEFAULT_SHADERS = Object.freeze(['**/*.wgsl']);
+const DEFAULT_SHADERS = Object.freeze(['./**/*.wgsl']);
 /**
  * @function
  * @name wgsl
@@ -14608,12 +14610,12 @@ function wgsl({ include = DEFAULT_SHADERS, exclude = undefined, warnDuplicatedIm
     const filter = /.+\.wgsl/;
     return {
         enforce: 'pre',
-        name: 'vite-plugin-glsl',
+        name: 'vite-plugin-wgsl',
         configureServer(devServer) {
         },
         configResolved(resolvedConfig) {
         },
-        transform(source, shader, ...other) {
+        transform(source, shader, options) {
             if (!filter.test(shader))
                 return;
             globalThis.GPUShaderStage = {
@@ -14621,14 +14623,19 @@ function wgsl({ include = DEFAULT_SHADERS, exclude = undefined, warnDuplicatedIm
                 FRAGMENT: 2,
                 COMPUTE: 4,
             };
-            const files = globSync([...include, '!node_modules'].filter(Boolean), {
+            if (options && 'cwd' in options) {
+                console.error(options.cwd);
+            }
+            const files = globSync([...include].filter(Boolean), {
                 ignore: exclude,
                 absolute: true,
+                cwd: options && 'cwd' in options ? options.cwd : undefined,
             });
             const fileMap = {};
             for (const file of files) {
                 fileMap[file] = actualFS.readFileSync(file, 'utf8');
             }
+            console.log(JSON.stringify(fileMap, null, 2));
             const registary = new ModuleRegistry({
                 wgsl: fileMap,
             });
@@ -14705,9 +14712,13 @@ const testImportModuleSpecifier = (moduleName) => {
 const testImportAttributes = (importAttributes) => importAttributes.type === 'wgsl';
 const generateTypeScriptDefinition = (_fileName, _importAttributes, code) => {
     console.error('is this where it fails');
-    console.error(JSON.stringify({ code, _fileName }));
+    console.error(JSON.stringify({ code, _fileName, _importAttributes }));
+    console.error(JSON.stringify(process$1.cwd()));
     console.error(JSON.stringify(vPlugin));
-    const result = vPlugin.transform(code, _fileName);
+    console.error(path$1.resolve('./'));
+    const result = vPlugin.transform(code, _fileName, {
+        cwd: process$1.env.VSCODE_CWD || path$1.resolve('~'),
+    });
     console.error(JSON.stringify(result));
     return `
     export const code: string;

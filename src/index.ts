@@ -1,5 +1,7 @@
 import plugin from './vite';
 import type { ImportablePlugin } from 'importable';
+import { resolve } from 'path';
+import process from 'node:process';
 const vPlugin = plugin();
 if (vPlugin.configResolved) {
 	(vPlugin as any).configResolved({
@@ -20,9 +22,13 @@ const testImportAttributes: ImportablePlugin['testImportModuleSpecifier'] = (
 const generateTypeScriptDefinition: ImportablePlugin['generateTypeScriptDefinition'] =
 	(_fileName, _importAttributes, code) => {
 		console.error('is this where it fails');
-		console.error(JSON.stringify({ code, _fileName }));
+		console.error(JSON.stringify({ code, _fileName, _importAttributes }));
+		console.error(JSON.stringify(process.cwd()));
 		console.error(JSON.stringify(vPlugin));
-		const result = (vPlugin as any).transform(code, _fileName);
+		console.error(resolve('./'));
+		const result = (vPlugin as any).transform(code, _fileName, {
+			cwd: process.env.VSCODE_CWD || resolve('~'),
+		});
 		console.error(JSON.stringify(result));
 		return `
     export const code: string;
